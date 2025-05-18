@@ -598,11 +598,10 @@ public class ModernCalculatorPanel extends JPanel {
                             break;
                         case "Bisection":
                             result = CalculatorBackend.bisection(function, guess1Value, guess2Value, toleranceValue, MAX_ITERATIONS);
-                            break;
-                        case "Fixed-Point":
+                            break;                        case "Fixed-Point":
                             result = CalculatorBackend.fixedPoint(function, guess1Value, toleranceValue, MAX_ITERATIONS);
                             break;
-                        case "False-Position":
+                        case "False Position":
                             result = CalculatorBackend.falsePosition(function, guess1Value, guess2Value, toleranceValue, MAX_ITERATIONS);
                             break;
                     }
@@ -739,7 +738,7 @@ public class ModernCalculatorPanel extends JPanel {
                     summary.append("Fixed-Point method uses the formula: xₙ₊₁ = g(xₙ)\n");
                     summary.append("The method converges when g'(x) < 1 in the neighborhood of the root.\n");
                     break;
-                case "False-Position":
+                case "False Position":
                     summary.append("False Position uses linear interpolation to find better approximations.\n");
                     summary.append("It often converges faster than bisection while maintaining its reliability.\n");
                     break;
@@ -749,7 +748,7 @@ public class ModernCalculatorPanel extends JPanel {
             
             if (steps.size() >= MAX_ITERATIONS) {
                 summary.append("\u2717 Reached maximum number of iterations (").append(MAX_ITERATIONS).append(")\n");
-            } else if (methodType.equals("Bisection") || methodType.equals("False-Position")) {
+            } else if (methodType.equals("Bisection") || methodType.equals("False Position")) {
                 summary.append("\u2717 Function may not have a sign change in the given interval\n");
             } else if (methodType.equals("Newton-Raphson")) {
                 // Check if derivative was too close to zero
@@ -771,8 +770,7 @@ public class ModernCalculatorPanel extends JPanel {
         historyArea.setText(summary.toString());
     }      private Object[] createTableRow(CalculatorBackend.IterationStep step, DecimalFormat df) {
         switch (methodType) {
-            case "Newton-Raphson":
-                return new Object[] {
+            case "Newton-Raphson":                return new Object[] {
                     step.getIteration(),
                     df.format(step.getX()),
                     df.format(step.getFx()),
@@ -810,10 +808,9 @@ public class ModernCalculatorPanel extends JPanel {
                         df.format(fx_prev_prev), // f(x_n-2)
                         df.format(step.getError())
                     };
-                }            
-            case "Bisection":
-            case "False-Position":
-                // In the CalculatorBackend, for Bisection and False-Position:
+                }              case "Bisection":
+            case "False Position":
+                // In the CalculatorBackend, for Bisection and False Position:
                 // - x stores the midpoint c
                 // - fx stores f(c)
                 // - fpx stores f(b) for display purposes
@@ -854,13 +851,12 @@ public class ModernCalculatorPanel extends JPanel {
     }
     
     private String[] getTableColumnNames() {
-        switch (methodType) {
-            case "Newton-Raphson":
-                return new String[]{"Iteration", "x_n", "f(x_n)", "f'(x_n)", "Error"};
+        switch (methodType) {            case "Newton-Raphson":
+                return new String[]{"Iter.", "xₙ", "f(xₙ)", "f'(xₙ)", "Error"};
             case "Secant":
-                return new String[]{"Iteration", "x_n-1", "x_n", "f(x_n-1)", "f(x_n)", "Error"};
-            case "Bisection":
-            case "False-Position":
+                return new String[]{"Iteration", "x_n-1", "x_n", "f(x_n-1)", "f(x_n)", "Error"};            case "Bisection":
+                return new String[]{"Iteration", "a", "b", "c", "f(c)", "Error"};
+            case "False Position":
                 return new String[]{"Iteration", "a", "b", "c", "f(c)", "Error"};
             case "Fixed-Point":
                 return new String[]{"Iteration", "x_n", "g(x_n)", "Error"};
@@ -887,10 +883,9 @@ public class ModernCalculatorPanel extends JPanel {
         }
     }
     
-    private String getFirstGuessLabel() {
-        switch (methodType) {
+    private String getFirstGuessLabel() {        switch (methodType) {
             case "Bisection":
-            case "False-Position":
+            case "False Position":
                 return "Left Endpoint (a)";
             case "Secant":
                 return "First Guess (x₀)";
@@ -899,10 +894,9 @@ public class ModernCalculatorPanel extends JPanel {
         }
     }
     
-    private String getSecondGuessLabel() {
-        switch (methodType) {
+    private String getSecondGuessLabel() {        switch (methodType) {
             case "Bisection":
-            case "False-Position":
+            case "False Position":
                 return "Right Endpoint (b)";
             case "Secant":
                 return "Second Guess (x₁)";
@@ -911,10 +905,9 @@ public class ModernCalculatorPanel extends JPanel {
         }
     }
     
-    private String getFirstGuessPlaceholder() {
-        switch (methodType) {
+    private String getFirstGuessPlaceholder() {        switch (methodType) {
             case "Bisection":
-            case "False-Position":
+            case "False Position":
                 return "e.g., 1";
             case "Secant":
                 return "e.g., 1";
@@ -923,10 +916,9 @@ public class ModernCalculatorPanel extends JPanel {
         }
     }
     
-    private String getSecondGuessPlaceholder() {
-        switch (methodType) {
+    private String getSecondGuessPlaceholder() {        switch (methodType) {
             case "Bisection":
-            case "False-Position":
+            case "False Position":
                 return "e.g., 3";
             case "Secant":
                 return "e.g., 2";
@@ -935,10 +927,9 @@ public class ModernCalculatorPanel extends JPanel {
         }
     }
     
-    private String getFirstGuessHint() {
-        switch (methodType) {
+    private String getFirstGuessHint() {        switch (methodType) {
             case "Bisection":
-            case "False-Position":
+            case "False Position":
                 return "Left endpoint of interval containing the root";
             case "Secant":
                 return "First point for the secant line approximation";
@@ -947,10 +938,9 @@ public class ModernCalculatorPanel extends JPanel {
         }
     }
     
-    private String getSecondGuessHint() {
-        switch (methodType) {
+    private String getSecondGuessHint() {        switch (methodType) {
             case "Bisection":
-            case "False-Position":
+            case "False Position":
                 return "Right endpoint of interval containing the root";
             case "Secant":
                 return "Second point for the secant line approximation";
@@ -966,10 +956,9 @@ public class ModernCalculatorPanel extends JPanel {
             case "Secant":
                 return "Example: Try solving x^2 - 4 = 0 with guesses 1 and 3";
             case "Bisection":
-                return "Example: Try solving x^2 - 4 = 0 with interval [1, 3]";
-            case "Fixed-Point":
+                return "Example: Try solving x^2 - 4 = 0 with interval [1, 3]";            case "Fixed-Point":
                 return "Example: Try solving x = sqrt(4+x) with initial guess 1";
-            case "False-Position":
+            case "False Position":
                 return "Example: Try solving x^2 - 4 = 0 with interval [1, 3]";
             default:
                 return "Example: Try solving x^2 - 4 = 0";
@@ -977,43 +966,25 @@ public class ModernCalculatorPanel extends JPanel {
     }
     
     /**
-     * Gets the tolerance value from the tolerance field.
-     * 
-     * @return the tolerance value or a default value if it cannot be parsed
+     * Creates a DecimalFormat instance with precision based on the tolerance value.
+     * @param tolerance The tolerance for calculations
+     * @return A DecimalFormat instance with appropriate precision
+     */
+    private DecimalFormat createDecimalFormatFromTolerance(double tolerance) {
+        int digits = Math.max(6, (int) Math.ceil(-Math.log10(tolerance)) + 2);
+        return new DecimalFormat("0." + "0".repeat(digits));
+    }
+    
+    /**
+     * Gets the current tolerance value from the tolerance field.
+     * @return The tolerance value as a double, or a default value (0.0001) if invalid
      */
     private double getToleranceValue() {
         try {
             return Double.parseDouble(toleranceField.getText().trim());
-        } catch (NumberFormatException e) {
-            return 1e-8; // Default value
+        } catch (NumberFormatException | NullPointerException e) {
+            return 0.0001; // Default tolerance
         }
-    }
-    
-    /**
-     * Creates a DecimalFormat based on the tolerance value.
-     * The number of decimal places shown will correspond to the tolerance.
-     * 
-     * @param tolerance the tolerance to base the format on
-     * @return a DecimalFormat with appropriate precision
-     */
-    private DecimalFormat createDecimalFormatFromTolerance(double tolerance) {
-        // Calculate number of decimal places needed based on tolerance
-        int decimalPlaces = 0;
-        if (tolerance > 0 && tolerance < 1.0) {
-            decimalPlaces = (int)Math.ceil(-Math.log10(tolerance));
-            // Ensure reasonable limits for display (between 2 and 15 decimal places)
-            decimalPlaces = Math.max(2, Math.min(15, decimalPlaces));
-        } else {
-            decimalPlaces = 8; // Default to 8 decimal places if tolerance is invalid
-        }
-        
-        // Build the format pattern (e.g., "0.00000")
-        StringBuilder pattern = new StringBuilder("0.");
-        for (int i = 0; i < decimalPlaces; i++) {
-            pattern.append("0");
-        }
-        
-        return new DecimalFormat(pattern.toString());
     }
     
     /**
@@ -1045,12 +1016,11 @@ public class ModernCalculatorPanel extends JPanel {
             // Update column headers based on method type
             if (methodType.equals("Bisection") || methodType.equals("False Position")) {
                 String[] columnNames = {"Iter.", "a", "b", "c", "f(c)", "Error"};
-                tableModel.setColumnIdentifiers(columnNames);
-            } else if (methodType.equals("Secant")) {
+                tableModel.setColumnIdentifiers(columnNames);            } else if (methodType.equals("Secant")) {
                 String[] columnNames = {"Iter.", "x₀", "x₁", "x₂", "f(x₂)", "Error"};
                 tableModel.setColumnIdentifiers(columnNames);
             } else if (methodType.equals("Newton-Raphson")) {
-                String[] columnNames = {"Iter.", "xₙ", "f(xₙ)", "f'(xₙ)", "xₙ₊₁", "Error"};
+                String[] columnNames = {"Iter.", "xₙ", "f(xₙ)", "f'(xₙ)", "Error"};
                 tableModel.setColumnIdentifiers(columnNames);
             } else if (methodType.equals("Fixed-Point")) {
                 String[] columnNames = {"Iter.", "xₙ", "g(xₙ)", "Error"};

@@ -1,7 +1,7 @@
 @echo off
 echo Compiling the Iteration Calculator...
-mkdir bin 2>nul
-javac -cp "lib/*" -d bin src/*.java
+if not exist bin mkdir bin
+javac -encoding UTF-8 -cp "lib/*" -d bin src/*.java
 if %errorlevel% neq 0 (
     echo Compilation failed! Please check your code for errors.
     pause
