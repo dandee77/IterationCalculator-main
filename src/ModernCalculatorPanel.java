@@ -964,15 +964,22 @@ public class ModernCalculatorPanel extends JPanel {
                 return "Example: Try solving x^2 - 4 = 0";
         }
     }
-    
-    /**
+      /**
      * Creates a DecimalFormat instance with precision based on the tolerance value.
      * @param tolerance The tolerance for calculations
      * @return A DecimalFormat instance with appropriate precision
-     */
-    private DecimalFormat createDecimalFormatFromTolerance(double tolerance) {
-        int digits = Math.max(6, (int) Math.ceil(-Math.log10(tolerance)) + 2);
-        return new DecimalFormat("0." + "0".repeat(digits));
+     */    private DecimalFormat createDecimalFormatFromTolerance(double tolerance) {
+        // Calculate the number of decimal places needed based on tolerance
+        // For example, if tolerance is 0.0001, we need exactly 4 decimal places
+        int digits = (int)Math.ceil(-Math.log10(tolerance));
+        
+        // Create pattern with the calculated number of decimal places
+        StringBuilder pattern = new StringBuilder("0.");
+        for (int i = 0; i < digits; i++) {
+            pattern.append("0");
+        }
+        
+        return new DecimalFormat(pattern.toString());
     }
     
     /**

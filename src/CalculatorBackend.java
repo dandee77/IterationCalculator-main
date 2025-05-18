@@ -31,8 +31,12 @@ public class CalculatorBackend {
             int iteration = 0;
             double error = Double.MAX_VALUE;
             
+            // Calculate format string based on tolerance
+            int digits = (int)Math.ceil(-Math.log10(tolerance));
+            String formatStr = "%." + digits + "f";
+            
             history.append("Newton-Raphson Method for finding root of: " + function + "\n");
-            history.append(String.format("Starting with initial guess x₀ = %.6f\n\n", x0));
+            history.append(String.format("Starting with initial guess x₀ = " + formatStr + "\n\n", x0));
             history.append("Iteration | x_n | f(x_n) | f'(x_n) | Error\n");
             history.append("---------|-----|--------|---------|------\n");
             
@@ -54,8 +58,8 @@ public class CalculatorBackend {
                 x1 = x0 - fx / fpx;
                 error = Math.abs(x1 - x0);
                 
-                // Record iteration details
-                String iterInfo = String.format("%9d | %.6f | %.6f | %.6f | %.6f\n", 
+                // Record iteration details with dynamic precision
+                String iterInfo = String.format("%9d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
                                               iteration+1, x0, fx, fpx, error);
                 history.append(iterInfo);
                 
@@ -71,9 +75,11 @@ public class CalculatorBackend {
                 return new Result(x0, history.toString(), steps, false);
             }
             
-            history.append("\nRoot found: x = " + String.format("%.10f", x0));
+            // Increased precision for final result
+            String highPrecisionFormat = "%." + (digits + 2) + "f";
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, x0));
             history.append("\nFunction value at root: f(x) = " + 
-                          String.format("%.10f", f.setVariable("x", x0).evaluate()));
+                          String.format(highPrecisionFormat, f.setVariable("x", x0).evaluate()));
             history.append("\nIterations required: " + iteration);
             
             return new Result(x0, history.toString(), steps, true);
@@ -108,17 +114,21 @@ public class CalculatorBackend {
             int iteration = 0;
             double error = Double.MAX_VALUE;
             
+            // Calculate format string based on tolerance
+            int digits = (int)Math.ceil(-Math.log10(tolerance));
+            String formatStr = "%." + digits + "f";
+            
             // Evaluate function at initial points
             double fx0 = f.setVariable("x", x0).evaluate();
             double fx1 = f.setVariable("x", x1).evaluate();
             
             history.append("Secant Method for finding root of: " + function + "\n");
-            history.append(String.format("Starting with initial guesses x₀ = %.6f and x₁ = %.6f\n\n", x0, x1));
+            history.append(String.format("Starting with initial guesses x₀ = " + formatStr + " and x₁ = " + formatStr + "\n\n", x0, x1));
             history.append("Iteration | x_n-1 | x_n | f(x_n-1) | f(x_n) | Error\n");
             history.append("----------|-------|-----|----------|--------|------\n");
             
             // Add initial step
-            String iterInfo = String.format("%10d | %.6f | %.6f | %.6f | %.6f | %s\n", 
+            String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | %s\n", 
                                          0, x0, x1, fx0, fx1, "N/A");
             history.append(iterInfo);
             
@@ -140,7 +150,7 @@ public class CalculatorBackend {
                 double fx2 = f.setVariable("x", x2).evaluate();
                 
                 // Record iteration details
-                iterInfo = String.format("%10d | %.6f | %.6f | %.6f | %.6f | %.6f\n", 
+                iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
                                        iteration+1, x1, x2, fx1, fx2, error);
                 history.append(iterInfo);
                 
@@ -161,9 +171,11 @@ public class CalculatorBackend {
                 return new Result(x1, history.toString(), steps, false);
             }
             
-            history.append("\nRoot found: x = " + String.format("%.10f", x1));
+            // Increased precision for final result
+            String highPrecisionFormat = "%." + (digits + 2) + "f";
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, x1));
             history.append("\nFunction value at root: f(x) = " + 
-                          String.format("%.10f", f.setVariable("x", x1).evaluate()));
+                          String.format(highPrecisionFormat, f.setVariable("x", x1).evaluate()));
             history.append("\nIterations required: " + iteration);
             
             return new Result(x1, history.toString(), steps, true);
@@ -194,13 +206,17 @@ public class CalculatorBackend {
                     .variable("x")
                     .build();
             
+            // Calculate format string based on tolerance
+            int digits = (int)Math.ceil(-Math.log10(tolerance));
+            String formatStr = "%." + digits + "f";
+            
             double fa = f.setVariable("x", a).evaluate();
             double fb = f.setVariable("x", b).evaluate();
             
             // Check if there's a sign change in the interval
             if (fa * fb >= 0) {
                 history.append("Error: Function must have opposite signs at interval endpoints.\n");
-                history.append(String.format("f(%.6f) = %.6f and f(%.6f) = %.6f have the same sign.", a, fa, b, fb));
+                history.append(String.format("f(" + formatStr + ") = " + formatStr + " and f(" + formatStr + ") = " + formatStr + " have the same sign.", a, fa, b, fb));
                 return new Result(Double.NaN, history.toString(), steps, false);
             }
             
@@ -210,7 +226,7 @@ public class CalculatorBackend {
             int iteration = 0;
             
             history.append("Bisection Method for finding root of: " + function + "\n");
-            history.append(String.format("Starting with interval [%.6f, %.6f]\n\n", a, b));
+            history.append(String.format("Starting with interval [" + formatStr + ", " + formatStr + "]\n\n", a, b));
             history.append("Iteration | a | b | c | f(a) | f(b) | f(c) | Error\n");
             history.append("----------|---|---|---|------|------|------|------\n");
             
@@ -220,7 +236,8 @@ public class CalculatorBackend {
                 fc = f.setVariable("x", c).evaluate();
                 
                 // Record iteration details
-                String iterInfo = String.format("%10d | %.6f | %.6f | %.6f | %.6f | %.6f | %.6f | %.6f\n", 
+                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + 
+                                              formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
                                               iteration+1, a, b, c, fa, fb, fc, error);
                 history.append(iterInfo);
                 
@@ -229,7 +246,7 @@ public class CalculatorBackend {
                 
                 // Check if we found the root exactly
                 if (Math.abs(fc) < 1e-10) {
-                    history.append("\nExact root found at x = " + String.format("%.10f", c));
+                    history.append("\nExact root found at x = " + String.format(formatStr, c));
                     return new Result(c, history.toString(), steps, true);
                 }
                 
@@ -255,9 +272,11 @@ public class CalculatorBackend {
                 return new Result(c, history.toString(), steps, false);
             }
             
-            history.append("\nRoot found: x = " + String.format("%.10f", c));
+            // Increased precision for final result
+            String highPrecisionFormat = "%." + (digits + 2) + "f";
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, c));
             history.append("\nFunction value at root: f(x) = " + 
-                          String.format("%.10f", f.setVariable("x", c).evaluate()));
+                          String.format(highPrecisionFormat, f.setVariable("x", c).evaluate()));
             history.append("\nIterations required: " + iteration);
             
             return new Result(c, history.toString(), steps, true);
@@ -287,13 +306,17 @@ public class CalculatorBackend {
                     .variable("x")
                     .build();
             
+            // Calculate format string based on tolerance
+            int digits = (int)Math.ceil(-Math.log10(tolerance));
+            String formatStr = "%." + digits + "f";
+            
             double x0 = initialGuess;
             double x1;
             double error = Double.MAX_VALUE;
             int iteration = 0;
             
             history.append("Fixed-Point Iteration Method for finding root of: x = " + function + "\n");
-            history.append(String.format("Starting with initial guess x₀ = %.6f\n\n", x0));
+            history.append(String.format("Starting with initial guess x₀ = " + formatStr + "\n\n", x0));
             history.append("Iteration | x_n | g(x_n) | Error\n");
             history.append("----------|-----|--------|------\n");
             
@@ -303,7 +326,7 @@ public class CalculatorBackend {
                 error = Math.abs(x1 - x0);
                 
                 // Record iteration details
-                String iterInfo = String.format("%10d | %.6f | %.6f | %.6f\n", 
+                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
                                               iteration+1, x0, x1, error);
                 history.append(iterInfo);
                 
@@ -334,8 +357,10 @@ public class CalculatorBackend {
             
             double fValue = f.setVariable("x", x0).evaluate();
             
-            history.append("\nFixed point found: x = " + String.format("%.10f", x0));
-            history.append("\nVerification: g(x) - x = " + String.format("%.10f", fValue));
+            // Increased precision for final result
+            String highPrecisionFormat = "%." + (digits + 2) + "f";
+            history.append("\nFixed point found: x = " + String.format(highPrecisionFormat, x0));
+            history.append("\nVerification: g(x) - x = " + String.format(highPrecisionFormat, fValue));
             history.append("\nIterations required: " + iteration);
             
             return new Result(x0, history.toString(), steps, true);
@@ -366,13 +391,17 @@ public class CalculatorBackend {
                     .variable("x")
                     .build();
             
+            // Calculate format string based on tolerance
+            int digits = (int)Math.ceil(-Math.log10(tolerance));
+            String formatStr = "%." + digits + "f";
+            
             double fa = f.setVariable("x", a).evaluate();
             double fb = f.setVariable("x", b).evaluate();
             
             // Check if there's a sign change in the interval
             if (fa * fb >= 0) {
                 history.append("Error: Function must have opposite signs at interval endpoints.\n");
-                history.append(String.format("f(%.6f) = %.6f and f(%.6f) = %.6f have the same sign.", a, fa, b, fb));
+                history.append(String.format("f(" + formatStr + ") = " + formatStr + " and f(" + formatStr + ") = " + formatStr + " have the same sign.", a, fa, b, fb));
                 return new Result(Double.NaN, history.toString(), steps, false);
             }
             
@@ -382,7 +411,7 @@ public class CalculatorBackend {
             int iteration = 0;
             
             history.append("False Position Method for finding root of: " + function + "\n");
-            history.append(String.format("Starting with interval [%.6f, %.6f]\n\n", a, b));
+            history.append(String.format("Starting with interval [" + formatStr + ", " + formatStr + "]\n\n", a, b));
             history.append("Iteration | a | b | c | f(a) | f(b) | f(c) | Error\n");
             history.append("----------|---|---|---|------|------|------|------\n");
             
@@ -401,7 +430,8 @@ public class CalculatorBackend {
                 }
                 
                 // Record iteration details
-                String iterInfo = String.format("%10d | %.6f | %.6f | %.6f | %.6f | %.6f | %.6f | %.6f\n", 
+                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + 
+                                              formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
                                               iteration+1, a, b, c, fa, fb, fc, error);
                 history.append(iterInfo);
                 
@@ -410,7 +440,7 @@ public class CalculatorBackend {
                 
                 // Check if we found the root exactly
                 if (Math.abs(fc) < 1e-10) {
-                    history.append("\nExact root found at x = " + String.format("%.10f", c));
+                    history.append("\nExact root found at x = " + String.format(formatStr, c));
                     return new Result(c, history.toString(), steps, true);
                 }
                 
@@ -433,9 +463,11 @@ public class CalculatorBackend {
                 return new Result(c, history.toString(), steps, false);
             }
             
-            history.append("\nRoot found: x = " + String.format("%.10f", c));
+            // Increased precision for final result
+            String highPrecisionFormat = "%." + (digits + 2) + "f";
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, c));
             history.append("\nFunction value at root: f(x) = " + 
-                          String.format("%.10f", f.setVariable("x", c).evaluate()));
+                          String.format(highPrecisionFormat, f.setVariable("x", c).evaluate()));
             history.append("\nIterations required: " + iteration);
             
             return new Result(c, history.toString(), steps, true);
@@ -516,5 +548,16 @@ public class CalculatorBackend {
         public double getError() {
             return error;
         }
+    }
+    
+    /**
+     * Creates a format string with precision based on the tolerance value.
+     * @param tolerance The tolerance for calculations
+     * @return A format string with appropriate precision (e.g., "%.6f")
+     */
+    private static String getFormatStringFromTolerance(double tolerance) {
+        // Calculate number of decimal places based on tolerance
+        int digits = (int)Math.ceil(-Math.log10(tolerance));
+        return "%." + digits + "f";
     }
 }
