@@ -1,5 +1,4 @@
 package src;
-
 import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -8,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.List;
-
 public class MethodCalculatorPanel extends JPanel {
     private JTextField functionField;
     private JTextField initialGuessField1;
@@ -25,18 +23,14 @@ public class MethodCalculatorPanel extends JPanel {
     private CardLayout cardLayout;
     private boolean hasTwoGuesses;
     
-    // Maximum iterations constant to prevent infinite loops
     private static final int MAX_ITERATIONS = 100;
 
     public MethodCalculatorPanel(String methodDescription, boolean hasTwoGuesses) {
         this.hasTwoGuesses = hasTwoGuesses;
-        Color outlineColor = new Color(200, 210, 230); // soft blue/gray outline
-        int radius = 40; // rounder corners
-
+        Color outlineColor = new Color(200, 210, 230);
+        int radius = 40;
         setBackground(new Color(250, 252, 255));
         setLayout(new MigLayout("fill, insets 32, gap 32", "[grow,fill][grow,fill]", "[grow,fill]"));
-
-        // Identify which method this panel represents based on the description
         if (methodDescription.contains("Newton's method")) {
             methodType = "Newton-Raphson";
         } else if (methodDescription.contains("Secant method")) {
@@ -50,33 +44,24 @@ public class MethodCalculatorPanel extends JPanel {
         } else {
             methodType = "Unknown";
         }
-
-        // Left panel for inputs
         JPanel left = new JPanel(new MigLayout(
                 "fillx, wrap 2, gapy 18", "[grow,fill][grow,fill]", ""
         ));
         left.setOpaque(false);
-
-        // Function label
         JLabel funcLabel = new JLabel("Enter Function f(x)");
         funcLabel.setFont(new Font("SansSerif", Font.BOLD, 17));
         left.add(funcLabel, "span 2, wrap");
-
-        // Function input in RoundedPanel
         functionField = new PlaceholderTextField(getFunctionPlaceholder());
         functionField.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        functionField.setBorder(null); // Remove outline
+        functionField.setBorder(null);
         functionField.setBackground(new Color(245, 247, 250));
         RoundedPanel functionPanel = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         functionPanel.setLayout(new BorderLayout());
         functionPanel.add(functionField, BorderLayout.CENTER);
         left.add(functionPanel, "span 2, h 48!, growx, wrap");
-
-        // Initial Guess labels
         JLabel guessLabel1 = new JLabel(hasTwoGuesses ? getFirstGuessLabel() : "Initial Guess");
         guessLabel1.setFont(new Font("SansSerif", Font.BOLD, 14));
         left.add(guessLabel1);
-
         JLabel guessLabel2 = new JLabel(getSecondGuessLabel());
         guessLabel2.setFont(new Font("SansSerif", Font.BOLD, 14));
         if (hasTwoGuesses) {
@@ -84,21 +69,18 @@ public class MethodCalculatorPanel extends JPanel {
         } else {
             left.add(new JLabel(), "wrap");
         }
-
-        // Initial Guess fields in RoundedPanels
         initialGuessField1 = new PlaceholderTextField(getFirstGuessPlaceholder());
         initialGuessField1.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        initialGuessField1.setBorder(null); // Remove outline
+        initialGuessField1.setBorder(null);
         initialGuessField1.setBackground(new Color(245, 247, 250));
         RoundedPanel guessPanel1 = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         guessPanel1.setLayout(new BorderLayout());
         guessPanel1.add(initialGuessField1, BorderLayout.CENTER);
         left.add(guessPanel1, "h 48!, growx");
-
         if (hasTwoGuesses) {
             initialGuessField2 = new PlaceholderTextField(getSecondGuessPlaceholder());
             initialGuessField2.setFont(new Font("SansSerif", Font.PLAIN, 16));
-            initialGuessField2.setBorder(null); // Remove outline
+            initialGuessField2.setBorder(null);
             initialGuessField2.setBackground(new Color(245, 247, 250));
             RoundedPanel guessPanel2 = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
             guessPanel2.setLayout(new BorderLayout());
@@ -107,13 +89,10 @@ public class MethodCalculatorPanel extends JPanel {
         } else {
             left.add(new JLabel(), "wrap");
         }
-
-        // Initial Guess hints
         JLabel guessHint1 = new JLabel(getFirstGuessHint());
         guessHint1.setFont(new Font("SansSerif", Font.PLAIN, 12));
         guessHint1.setForeground(new Color(150, 150, 150));
         left.add(guessHint1);
-
         if (hasTwoGuesses) {
             JLabel guessHint2 = new JLabel(getSecondGuessHint());
             guessHint2.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -122,29 +101,21 @@ public class MethodCalculatorPanel extends JPanel {
         } else {
             left.add(new JLabel(), "wrap");
         }
-
-        // Tolerance label
         JLabel tolLabel = new JLabel("Tolerance");
         tolLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         left.add(tolLabel, "span 2, wrap");
-
-        // Tolerance field in RoundedPanel
         toleranceField = new PlaceholderTextField("e.g., 0.0001");
         toleranceField.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        toleranceField.setBorder(null); // Remove outline
+        toleranceField.setBorder(null);
         toleranceField.setBackground(new Color(245, 247, 250));
         RoundedPanel tolPanel = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         tolPanel.setLayout(new BorderLayout());
         tolPanel.add(toleranceField, BorderLayout.CENTER);
         left.add(tolPanel, "span 2, h 48!, growx, wrap");
-
-        // Tolerance hint
         JLabel tolHint = new JLabel("Desired accuracy of result");
         tolHint.setFont(new Font("SansSerif", Font.PLAIN, 12));
         tolHint.setForeground(new Color(150, 150, 150));
         left.add(tolHint, "span 2, wrap");
-
-        // Description Panel in RoundedPanel
         RoundedPanel descPanel = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         descPanel.setLayout(new BorderLayout());
         JLabel descTitle = new JLabel("Method Description");
@@ -162,37 +133,29 @@ public class MethodCalculatorPanel extends JPanel {
         descPanel.add(descTitle, BorderLayout.NORTH);
         descPanel.add(desc, BorderLayout.CENTER);
         left.add(descPanel, "span 2, growx, h 80!, wrap");
-
-        // Calculate button in RoundedPanel
         calculateButton = new JButton("Calculate");
         calculateButton.setFont(new Font("SansSerif", Font.BOLD, 18));
         calculateButton.setBackground(new Color(51, 102, 255));
         calculateButton.setForeground(Color.WHITE);
         calculateButton.setFocusPainted(false);
-        calculateButton.setBorder(null); // Remove outline
+        calculateButton.setBorder(null);
         RoundedPanel calcPanel = new RoundedPanel(radius, new Color(51, 102, 255), outlineColor);
         calcPanel.setLayout(new BorderLayout());
         calcPanel.add(calculateButton, BorderLayout.CENTER);
         left.add(calcPanel, "span 2, growx, h 54!, gaptop 30, aligny bottom");
-
-        // Right panel with CardLayout for switching between welcome screen and results
         JPanel right = new JPanel();
         cardLayout = new CardLayout();
         right.setLayout(cardLayout);
         right.setOpaque(false);
-
-        // Welcome panel
         JPanel welcomePanel = new JPanel(new BorderLayout());
         welcomePanel.setOpaque(false);
         RoundedPanel welcomeContent = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         welcomeContent.setLayout(new BorderLayout());
-        
         JLabel welcomeTitle = new JLabel("Welcome to " + methodType + " Method");
         welcomeTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
         welcomeTitle.setForeground(new Color(51, 102, 255));
         welcomeTitle.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
         welcomeContent.add(welcomeTitle, BorderLayout.NORTH);
-        
         JTextArea welcomeText = new JTextArea(
             "Enter your function and parameters on the left panel, then click Calculate to find the root.\n\n" +
             "This calculator will show you step-by-step how the " + methodType + " method converges to the solution."
@@ -204,34 +167,23 @@ public class MethodCalculatorPanel extends JPanel {
         welcomeText.setOpaque(false);
         welcomeText.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         welcomeContent.add(welcomeText, BorderLayout.CENTER);
-        
-        // Add a sample equation specific to the method
         String sampleEquation = getSampleEquation();
-        
         JLabel exampleLabel = new JLabel(sampleEquation);
         exampleLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
         exampleLabel.setForeground(new Color(100, 100, 100));
         exampleLabel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
         welcomeContent.add(exampleLabel, BorderLayout.SOUTH);
-        
         welcomePanel.add(welcomeContent, BorderLayout.CENTER);
-        
-        // Result panel with table view and details
         resultPanel = new JPanel(new MigLayout("fill, wrap 1, gapy 18", "[grow,fill]", ""));
         resultPanel.setOpaque(false);
-        
-        // Iteration table panel
         iterationPanel = new JPanel(new BorderLayout());
         iterationPanel.setOpaque(false);
         RoundedPanel tableRoundedPanel = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         tableRoundedPanel.setLayout(new BorderLayout());
-        
         JLabel tableTitle = new JLabel("Iteration Steps");
         tableTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
         tableTitle.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         tableRoundedPanel.add(tableTitle, BorderLayout.NORTH);
-        
-        // Create table for iterations with method-specific columns
         String[] columnNames = getTableColumnNames();
         tableModel = new DefaultTableModel(columnNames, 0);
         iterationTable = new JTable(tableModel);
@@ -241,43 +193,30 @@ public class MethodCalculatorPanel extends JPanel {
         iterationTable.setGridColor(new Color(230, 230, 230));
         iterationTable.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
         iterationTable.getTableHeader().setBackground(new Color(240, 240, 240));
-        
         JScrollPane tableScrollPane = new JScrollPane(iterationTable);
         tableScrollPane.setBorder(null);
         tableRoundedPanel.add(tableScrollPane, BorderLayout.CENTER);
-        
         iterationPanel.add(tableRoundedPanel);
-        
-        // Result details panel
         JPanel detailsPanel = new JPanel(new MigLayout("fillx, wrap 1", "[grow,fill]", ""));
         detailsPanel.setOpaque(false);
-        
-        // Answer panel
         RoundedPanel answerRoundedPanel = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         answerRoundedPanel.setLayout(new BorderLayout());
-        
         JPanel answerHeader = new JPanel(new BorderLayout());
         answerHeader.setOpaque(false);
-        
         JLabel answerLabel = new JLabel("Root Found");
         answerLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
         answerLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 0));
-        
         JLabel methodLabel = new JLabel(methodType + " Method");
         methodLabel.setFont(new Font("SansSerif", Font.PLAIN, 13));
         methodLabel.setForeground(new Color(100, 100, 100));
         methodLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 20));
         methodLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        
         answerHeader.add(answerLabel, BorderLayout.WEST);
         answerHeader.add(methodLabel, BorderLayout.EAST);
-        
         answerRoundedPanel.add(answerHeader, BorderLayout.NORTH);
-        
         JPanel answerContent = new JPanel(new BorderLayout());
         answerContent.setOpaque(false);
         answerContent.setBorder(BorderFactory.createEmptyBorder(5, 20, 15, 20));
-        
         answerField = new JTextField();
         answerField.setEditable(false);
         answerField.setFont(new Font("SansSerif", Font.BOLD, 24));
@@ -285,21 +224,15 @@ public class MethodCalculatorPanel extends JPanel {
         answerField.setForeground(new Color(51, 102, 255));
         answerField.setBackground(new Color(245, 247, 250));
         answerField.setBorder(null);
-        
         answerContent.add(answerField, BorderLayout.CENTER);
         answerRoundedPanel.add(answerContent, BorderLayout.CENTER);
-        
         detailsPanel.add(answerRoundedPanel, "growx, h 100!");
-        
-        // Function summary panel
         RoundedPanel summaryPanel = new RoundedPanel(radius, new Color(245, 247, 250), outlineColor);
         summaryPanel.setLayout(new BorderLayout());
-        
         JLabel summaryTitle = new JLabel("Calculation Summary");
         summaryTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
         summaryTitle.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         summaryPanel.add(summaryTitle, BorderLayout.NORTH);
-        
         historyArea = new JTextArea();
         historyArea.setEditable(false);
         historyArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -307,30 +240,19 @@ public class MethodCalculatorPanel extends JPanel {
         historyArea.setLineWrap(true);
         historyArea.setWrapStyleWord(true);
         historyArea.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        
         JScrollPane historyScroll = new JScrollPane(historyArea);
         historyScroll.setBorder(null);
         historyScroll.setOpaque(false);
         historyScroll.getViewport().setOpaque(false);
-        
         summaryPanel.add(historyScroll, BorderLayout.CENTER);
-        
         detailsPanel.add(summaryPanel, "growx, h 150!");
-        
         resultPanel.add(iterationPanel, "grow, h 60%");
         resultPanel.add(detailsPanel, "grow, h 40%");
-        
-        // Add both panels to the card layout
         right.add(welcomePanel, "welcome");
         right.add(resultPanel, "results");
-        
-        // Initially show the welcome panel
         cardLayout.show(right, "welcome");
-        
         add(left, "grow, push, w 40%");
         add(right, "grow, push, w 60%");
-
-        // Add action listener to calculate button
         calculateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -460,7 +382,7 @@ public class MethodCalculatorPanel extends JPanel {
             String initialGuess1 = initialGuessField1.getText().trim();
             String initialGuess2 = hasTwoGuesses ? initialGuessField2.getText().trim() : "";
             
-            // Validate inputs
+            
             if (function.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a function.", "Input Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -482,7 +404,7 @@ public class MethodCalculatorPanel extends JPanel {
                 return;
             }
             
-            // Parse inputs
+            
             double guess1Value;
             double guess2Value = 0;
             double toleranceValue;
@@ -516,7 +438,7 @@ public class MethodCalculatorPanel extends JPanel {
                 return;
             }
             
-            // Call the appropriate method based on the method type
+            
             CalculatorBackend.Result result = null;
             
             switch (methodType) {
@@ -537,10 +459,10 @@ public class MethodCalculatorPanel extends JPanel {
                     break;
             }
             
-            // Display results
+            
             if (result != null) {
                 updateResultDisplay(result, function);
-                // Switch to the results panel
+                
                 cardLayout.show((Container)resultPanel.getParent(), "results");
             } else {
                 historyArea.setText("Method not implemented yet: " + methodType);
@@ -557,28 +479,28 @@ public class MethodCalculatorPanel extends JPanel {
     }
     
     private void updateResultDisplay(CalculatorBackend.Result result, String function) {
-        // Update the answer field
+        
         DecimalFormat df = new DecimalFormat("0.00000000");
         
         if (result.hasConverged()) {
             answerField.setText(df.format(result.getRoot()));
-            answerField.setForeground(new Color(51, 102, 255)); // Reset to blue for success
+            answerField.setForeground(new Color(51, 102, 255));
         } else {
             answerField.setText("Failed to converge");
-            answerField.setForeground(new Color(220, 50, 50)); // Red color for failure
+            answerField.setForeground(new Color(220, 50, 50));
         }
         
-        // Clear the table
+        
         tableModel.setRowCount(0);
         
-        // Populate the table with iteration steps based on method type
+        
         List<CalculatorBackend.IterationStep> steps = result.getSteps();
         for (CalculatorBackend.IterationStep step : steps) {
             Object[] row = createTableRow(step, df);
             tableModel.addRow(row);
         }
         
-        // Update the summary area
+        
         StringBuilder summary = new StringBuilder();
         summary.append("Function: ").append(function).append("\n\n");
         
@@ -586,21 +508,21 @@ public class MethodCalculatorPanel extends JPanel {
             summary.append("✓ Root found: x = ").append(df.format(result.getRoot())).append("\n");
             summary.append("✓ Iterations required: ").append(steps.size()).append("\n");
             
-            // Get function value at the root (if available)
+            
             if (!steps.isEmpty()) {
                 if (methodType.equals("Fixed-Point")) {
-                    // For fixed point, the function value is actually g(x)
+                    
                     double lastGx = steps.get(steps.size() - 1).getFx();
                     summary.append("✓ g(x) value at root: ").append(df.format(lastGx)).append("\n");
                     summary.append("✓ |g(x) - x| at root: ").append(df.format(Math.abs(lastGx - result.getRoot()))).append("\n");
                 } else {
-                    // For other methods, we can get f(x)
+                    
                     double lastFx = steps.get(steps.size() - 1).getFx();
                     summary.append("✓ Function value at root: f(x) = ").append(df.format(lastFx)).append("\n");
                 }
             }
             
-            // Get final error
+            
             double lastError = steps.isEmpty() ? 0 : steps.get(steps.size() - 1).getError();
             summary.append("✓ Final error: ").append(df.format(lastError));
         } else {
@@ -611,7 +533,7 @@ public class MethodCalculatorPanel extends JPanel {
             } else if (methodType.equals("Bisection") || methodType.equals("False-Position")) {
                 summary.append("✗ Function may not have a sign change in the given interval\n");
             } else if (methodType.equals("Newton-Raphson")) {
-                // Check if derivative was too close to zero
+                
                 double lastFpx = steps.isEmpty() ? 0 : steps.get(steps.size() - 1).getFpx();
                 if (Math.abs(lastFpx) < 1e-10) {
                     summary.append("✗ Derivative became too close to zero\n");
@@ -638,7 +560,7 @@ public class MethodCalculatorPanel extends JPanel {
                 };
             case "Secant":
                 if (step.getIteration() == 0) {
-                    // First row just displays initial guesses
+                    
                     return new Object[] {
                         step.getIteration(),
                         df.format(step.getX()),
@@ -651,9 +573,9 @@ public class MethodCalculatorPanel extends JPanel {
                     return new Object[] {
                         step.getIteration(),
                         df.format(step.getX()),
-                        "Next",  // This would be calculated in the next step
+                        "Next",  
                         df.format(step.getFx()),
-                        "Next",  // This would be calculated in the next step
+                        "Next",  
                         df.format(step.getError())
                     };
                 }
@@ -661,8 +583,8 @@ public class MethodCalculatorPanel extends JPanel {
             case "False-Position":
                 return new Object[] {
                     step.getIteration(),
-                    "a",  // Would need to track interval bounds
-                    "b",  // Would need to track interval bounds
+                    step.getA() != null ? df.format(step.getA()) : "a",
+                    step.getB() != null ? df.format(step.getB()) : "b",
                     df.format(step.getX()),
                     df.format(step.getFx()),
                     df.format(step.getError())
@@ -671,7 +593,7 @@ public class MethodCalculatorPanel extends JPanel {
                 return new Object[] {
                     step.getIteration(),
                     df.format(step.getX()),
-                    df.format(step.getFx()),  // This is g(x) in fixed-point
+                    df.format(step.getFx()),
                     df.format(step.getError())
                 };
             default:

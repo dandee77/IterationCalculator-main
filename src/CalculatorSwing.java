@@ -18,7 +18,6 @@ public class CalculatorSwing extends JFrame {
     private final Color accentColor = new Color(115, 138, 247);
     private final Color backgroundColor = new Color(18, 23, 30);
     private final Color textColor = new Color(236, 239, 244);
-    // private final Color panelColor = new Color(35, 42, 52); // This color is used in the CSS
     private final Color hoverColor = new Color(46, 54, 66);
     private final String[] methodNames = {
         "Newton-Raphson", "Secant", "Bisection", "Fixed-Point", "False Position", "Matrix Multiplication", "Cramer's Rule"

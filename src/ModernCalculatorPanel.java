@@ -1,5 +1,4 @@
 package src;
-
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
@@ -27,9 +26,9 @@ public class ModernCalculatorPanel extends JPanel {
     private boolean hasTwoGuesses;
     private JLabel statusLabel;
     private JProgressBar progressBar;
-    private JPanel progressPanel; // Added this field to store a reference to the progress panel
+    private JPanel progressPanel; 
     
-    // Visual elements
+
     private final Color backgroundColor = new Color(18, 23, 30);
     private final Color panelColor = new Color(35, 42, 52);
     private final Color accentColor = new Color(115, 138, 247);
@@ -40,18 +39,18 @@ public class ModernCalculatorPanel extends JPanel {
     private final Color separatorColor = new Color(55, 65, 80);
     private final Color inputFieldColor = new Color(46, 54, 66);
     
-    // Constants
+  
     private static final int MAX_ITERATIONS = 100;
     private static final int BORDER_RADIUS = 12;
     
-    // Animation elements
+
     private Timer animationTimer;
     private int animationStep = 0;
     
     public ModernCalculatorPanel(String methodDescription, boolean hasTwoGuesses) {
         this.hasTwoGuesses = hasTwoGuesses;
         
-        // Identify method type
+     
         if (methodDescription.contains("Newton's method")) {
             methodType = "Newton-Raphson";
         } else if (methodDescription.contains("Secant method")) {
@@ -68,15 +67,14 @@ public class ModernCalculatorPanel extends JPanel {
         setBackground(backgroundColor);
         setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
         setLayout(new BorderLayout(20, 20));
-        
-        // Create main containers
+    
         JPanel leftPanel = createLeftPanel(methodDescription);
         JPanel rightPanel = createRightPanel();
         
         add(leftPanel, BorderLayout.WEST);
         add(rightPanel, BorderLayout.CENTER);
         
-        // Set up animation timer
+ 
         animationTimer = new Timer(50, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,7 +84,7 @@ public class ModernCalculatorPanel extends JPanel {
                 }
                 progressBar.setValue(animationStep * 10);
                 
-                // Animate status text
+              
                 StringBuilder status = new StringBuilder("Calculating");
                 for (int i = 0; i < animationStep % 4; i++) {
                     status.append(".");
@@ -102,14 +100,13 @@ public class ModernCalculatorPanel extends JPanel {
         leftPanel.setBackground(backgroundColor);
         leftPanel.setPreferredSize(new Dimension(320, 100));
         
-        // Method title
+      
         JLabel titleLabel = new JLabel(methodType + " Method");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titleLabel.setForeground(textColor);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        
-        // Method description
+      
         JTextArea descriptionArea = new JTextArea(methodDescription);
         descriptionArea.setWrapStyleWord(true);
         descriptionArea.setLineWrap(true);

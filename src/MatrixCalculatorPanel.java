@@ -2,10 +2,10 @@ package src;
 
 import javax.swing.*;
 import java.awt.*;
-// import java.awt.event.*;
+
 
 public class MatrixCalculatorPanel extends JPanel {
-    private final String mode; // "Matrix Multiplication" or "Cramer's Rule"
+    private final String mode;
     private JPanel matrixInputPanel;
     private JButton computeButton;
     private JSpinner rowsA, colsA, rowsB, colsB;
@@ -14,7 +14,7 @@ public class MatrixCalculatorPanel extends JPanel {
     private JTextField[][] augmentedFields;
     private int currentRowsA = 2, currentColsA = 2, currentRowsB = 2, currentColsB = 2;
 
-    // Theme colors (matching ModernCalculatorPanel)
+
     private final Color backgroundColor = new Color(18, 23, 30);
     private final Color panelColor = new Color(35, 42, 52);
     private final Color accentColor = new Color(115, 138, 247);
@@ -22,7 +22,7 @@ public class MatrixCalculatorPanel extends JPanel {
     private final Color errorColor = new Color(251, 85, 85);
     private final Color textColor = new Color(236, 239, 244);
     private final Color textSecondaryColor = new Color(160, 170, 190);
-    private final Color separatorColor = new Color(55, 65, 80);
+
     private final Color inputFieldColor = new Color(46, 54, 66);
 
     public MatrixCalculatorPanel(String mode) {
@@ -31,7 +31,7 @@ public class MatrixCalculatorPanel extends JPanel {
         setBackground(backgroundColor);
 
 
-        // Title/Header and Description
+
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         headerPanel.setOpaque(false);
@@ -44,7 +44,7 @@ public class MatrixCalculatorPanel extends JPanel {
             title.setText("Matrix Multiplication");
         } else {
             title.setText("Cramer's Rule");
-        }        // Description (top, less bright)
+        }
         JLabel desc = new JLabel();
         desc.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         desc.setForeground(textSecondaryColor);
@@ -59,11 +59,11 @@ public class MatrixCalculatorPanel extends JPanel {
         headerPanel.add(desc);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Matrix input area
+
         matrixInputPanel = new RoundedPanel(18, panelColor);
         matrixInputPanel.setLayout(new BoxLayout(matrixInputPanel, BoxLayout.Y_AXIS));
         matrixInputPanel.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 60));
-        add(matrixInputPanel, BorderLayout.CENTER);        // Compute button (centered below matrix input)
+        add(matrixInputPanel, BorderLayout.CENTER);
         computeButton = new JButton("Compute");
         computeButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
         computeButton.setBackground(accentColor);
@@ -118,7 +118,7 @@ public class MatrixCalculatorPanel extends JPanel {
             updateBtn.setBorder(BorderFactory.createEmptyBorder(6, 15, 6, 15));
             updateBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
             sizePanel.add(updateBtn);
-            matrixInputPanel.add(sizePanel);            // Instructions (below sizing)
+            matrixInputPanel.add(sizePanel);
             JLabel instr = new JLabel("Enter two matrices. Only numbers are allowed. Example: A = [[1,2],[3,4]], B = [[5,6],[7,8]]");
             instr.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             instr.setForeground(textSecondaryColor);
@@ -172,7 +172,7 @@ public class MatrixCalculatorPanel extends JPanel {
             matrixInputPanel.add(Box.createVerticalStrut(20));
             matrixInputPanel.add(abPanel);
         } else {
-            // Cramer's Rule: Augmented matrix input
+
             JPanel sizePanel = new JPanel();
             sizePanel.setOpaque(false);
             sizePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -192,7 +192,7 @@ public class MatrixCalculatorPanel extends JPanel {
             updateBtn.setBorder(BorderFactory.createEmptyBorder(6, 15, 6, 15));
             updateBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
             sizePanel.add(updateBtn);
-            matrixInputPanel.add(sizePanel);            // Instructions (below sizing)
+            matrixInputPanel.add(sizePanel);
             JLabel instr = new JLabel("Enter an augmented matrix (A|b). Only numbers are allowed. Example: [[2,1,3,9],[1,-1,2,8],[3,2,1,10]]");
             instr.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             instr.setForeground(textSecondaryColor);
@@ -257,9 +257,9 @@ public class MatrixCalculatorPanel extends JPanel {
         } catch (Exception ex) {
             showResultDialog("Error: " + ex.getMessage(), false);
         }
-    }    // Show result in a themed dialog
+    }
     private void showResultDialog(String result, boolean success) {
-        // Use a rounded panel for the dialog
+
         RoundedPanel panel = new RoundedPanel(22, panelColor);
         panel.setLayout(new BorderLayout(0, 0));
         panel.setBorder(BorderFactory.createEmptyBorder(18, 24, 18, 24));        JLabel label = new JLabel(success ? "Result" : "Error", SwingConstants.CENTER);
@@ -280,7 +280,7 @@ public class MatrixCalculatorPanel extends JPanel {
         scroll.setBackground(panelColor);
         scroll.getViewport().setBackground(panelColor);
         scroll.setPreferredSize(new Dimension(420, 120));
-        panel.add(scroll, BorderLayout.CENTER);        // Add a close button
+        panel.add(scroll, BorderLayout.CENTER);
         JButton closeButton = new JButton("Close");
         closeButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         closeButton.setBackground(success ? accentColor : errorColor);        closeButton.setForeground(Color.WHITE);
@@ -293,22 +293,22 @@ public class MatrixCalculatorPanel extends JPanel {
         buttonPanel.add(closeButton);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Create an undecorated JDialog manually
+
         final JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this));
-        dialog.setUndecorated(true); // Set undecorated BEFORE making displayable
+        dialog.setUndecorated(true);
         dialog.setModal(true);
         dialog.setContentPane(panel);
         
-        // Close on button click
+
         closeButton.addActionListener(e -> dialog.dispose());
-          // Add rounded border
+
         dialog.getRootPane().setBorder(BorderFactory.createLineBorder(success ? successColor : errorColor, 3, true));
         
-        // Size and position
+
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
-    }    // Helper to create styled matrix input fields
+    }
     private JTextField createStyledField() {
         JTextField field = new JTextField(3);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
@@ -330,7 +330,6 @@ public class MatrixCalculatorPanel extends JPanel {
         return sb.toString();
     }
     
-    // Helper to style spinners for better look & feel
     private void styleSpinner(JSpinner spinner) {
         spinner.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         spinner.setBorder(BorderFactory.createLineBorder(accentColor, 1, true));

@@ -17,18 +17,18 @@ public class TwoGuessMethodPanel extends JPanel {
         setBackground(new Color(250, 252, 255));
         setLayout(new MigLayout("fill, insets 32, gap 32", "[grow,fill][grow,fill]", "[grow,fill]"));
 
-        // Left panel for inputs
+
         JPanel left = new JPanel(new MigLayout(
                 "fillx, wrap 2, gapy 18", "[grow,fill][grow,fill]", ""
         ));
         left.setOpaque(false);
 
-        // Function label
+
         JLabel funcLabel = new JLabel("Enter Function f(x)");
         funcLabel.setFont(new Font("SansSerif", Font.BOLD, 17));
         left.add(funcLabel, "span 2, wrap");
 
-        // Function input in RoundedPanel
+
         functionField = new PlaceholderTextField("e.g., x^2 - 4x + 4");
         functionField.setFont(new Font("SansSerif", Font.PLAIN, 16));
         functionField.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
@@ -38,7 +38,7 @@ public class TwoGuessMethodPanel extends JPanel {
         functionPanel.add(functionField, BorderLayout.CENTER);
         left.add(functionPanel, "span 2, h 44!, growx, wrap");
 
-        // Initial Guess labels
+
         JLabel guessLabel1 = new JLabel("Initial Guess");
         guessLabel1.setFont(new Font("SansSerif", Font.BOLD, 14));
         left.add(guessLabel1);
@@ -47,7 +47,7 @@ public class TwoGuessMethodPanel extends JPanel {
         guessLabel2.setFont(new Font("SansSerif", Font.BOLD, 14));
         left.add(guessLabel2, "wrap");
 
-        // Initial Guess fields in RoundedPanels
+
         initialGuessField1 = new PlaceholderTextField("e.g., x₀ = 1");
         initialGuessField1.setFont(new Font("SansSerif", Font.PLAIN, 16));
         initialGuessField1.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
@@ -66,7 +66,7 @@ public class TwoGuessMethodPanel extends JPanel {
         guessPanel2.add(initialGuessField2, BorderLayout.CENTER);
         left.add(guessPanel2, "h 44!, growx, wrap");
 
-        // Initial Guess hints
+
         JLabel guessHint1 = new JLabel("Starting point for iteration for x₀");
         guessHint1.setFont(new Font("SansSerif", Font.PLAIN, 12));
         guessHint1.setForeground(new Color(150, 150, 150));
@@ -77,12 +77,12 @@ public class TwoGuessMethodPanel extends JPanel {
         guessHint2.setForeground(new Color(150, 150, 150));
         left.add(guessHint2, "wrap");
 
-        // Tolerance label
+
         JLabel tolLabel = new JLabel("Tolerance");
         tolLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         left.add(tolLabel, "span 2, wrap");
 
-        // Tolerance field in RoundedPanel
+
         toleranceField = new PlaceholderTextField("e.g., 0.0001");
         toleranceField.setFont(new Font("SansSerif", Font.PLAIN, 16));
         toleranceField.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
@@ -92,13 +92,13 @@ public class TwoGuessMethodPanel extends JPanel {
         tolPanel.add(toleranceField, BorderLayout.CENTER);
         left.add(tolPanel, "span 2, h 44!, growx, wrap");
 
-        // Tolerance hint
+
         JLabel tolHint = new JLabel("Desired accuracy of result");
         tolHint.setFont(new Font("SansSerif", Font.PLAIN, 12));
         tolHint.setForeground(new Color(150, 150, 150));
         left.add(tolHint, "span 2, wrap");
 
-        // Description Panel in RoundedPanel
+
         RoundedPanel descPanel = new RoundedPanel(28, new Color(245, 247, 250));
         descPanel.setLayout(new BorderLayout());
         JLabel descTitle = new JLabel("Method Description");
@@ -117,7 +117,7 @@ public class TwoGuessMethodPanel extends JPanel {
         descPanel.add(desc, BorderLayout.CENTER);
         left.add(descPanel, "span 2, growx, h 80!, wrap");
 
-        // Calculate button in RoundedPanel
+
         calculateButton = new JButton("Calculate");
         calculateButton.setFont(new Font("SansSerif", Font.BOLD, 18));
         calculateButton.setBackground(new Color(51, 102, 255));
@@ -129,7 +129,7 @@ public class TwoGuessMethodPanel extends JPanel {
         calcPanel.add(calculateButton, BorderLayout.CENTER);
         left.add(calcPanel, "span 2, growx, h 54!, gaptop 30, aligny bottom");
 
-        // Right panel for history and answer
+
         JPanel right = new JPanel(new MigLayout(
                 "fill, wrap 1, gapy 18", "[grow,fill]", ""
         ));
