@@ -1,3 +1,5 @@
+package src;
+
 import com.formdev.flatlaf.FlatDarkLaf;
 import javax.swing.*;
 import java.awt.*;
@@ -19,17 +21,19 @@ public class CalculatorSwing extends JFrame {
     // private final Color panelColor = new Color(35, 42, 52); // This color is used in the CSS
     private final Color hoverColor = new Color(46, 54, 66);
     private final String[] methodNames = {
-        "Newton-Raphson", "Secant", "Bisection", "Fixed-Point", "False Position"
+        "Newton-Raphson", "Secant", "Bisection", "Fixed-Point", "False Position", "Matrix Multiplication", "Cramer's Rule"
     };
     private final String[] methodDescriptions = {
         "Newton's method finds successively better approximations using the function's derivative.",
         "The Secant method uses a sequence of roots of secant lines to approximate a root of a function.",
         "The Bisection method repeatedly bisects an interval and selects a subinterval in which a root must lie.",
         "The Fixed-Point method iterates a function to find a point where f(x) = x.",
-        "The False Position method is similar to bisection but uses a secant line to find the root."
+        "The False Position method is similar to bisection but uses a secant line to find the root.",
+        "Multiply two matrices of compatible sizes.",
+        "Solve a system of linear equations using Cramer's Rule."
     };
     private final boolean[] hasTwoGuesses = {
-        false, true, true, false, true
+        false, true, true, false, true, false, false
     };
     
     // Custom window closing operation
@@ -106,7 +110,12 @@ public class CalculatorSwing extends JFrame {
         // Add method panels to main panel
         for (int i = 0; i < methodNames.length; i++) {
             String methodName = methodNames[i];
-            JPanel methodPanel = new ModernCalculatorPanel(methodDescriptions[i], hasTwoGuesses[i]);
+            JPanel methodPanel;
+            if (methodName.equals("Matrix Multiplication") || methodName.equals("Cramer's Rule")) {
+                methodPanel = new MatrixCalculatorPanel(methodName);
+            } else {
+                methodPanel = new ModernCalculatorPanel(methodDescriptions[i], hasTwoGuesses[i]);
+            }
             methodPanels.put(methodName, methodPanel);
             mainPanel.add(methodPanel, methodName);
         }

@@ -1,3 +1,5 @@
+package src;
+
 import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

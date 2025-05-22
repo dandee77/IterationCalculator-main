@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.border.AbstractBorder;
 import java.awt.*;
 

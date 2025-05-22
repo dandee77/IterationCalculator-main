@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -6,7 +8,7 @@ public class RoundedPanel extends JPanel {
     private final int radius;
     private final Color bg;
     // Outline color is not currently used but kept for future enhancements
-    private final Color outline;
+    // private final Color outline; // Unused field removed
 
     public RoundedPanel(int radius, Color bg) {
         this(radius, bg, new Color(200, 210, 230)); // default outline color
@@ -15,7 +17,7 @@ public class RoundedPanel extends JPanel {
     public RoundedPanel(int radius, Color bg, Color outline) {
         this.radius = radius;
         this.bg = bg;
-        this.outline = outline;
+        // this.outline = outline; // Field removed, assignment removed
         setOpaque(false);
     }
 

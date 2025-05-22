@@ -1,7 +1,12 @@
+package src;
+
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
+// import java.util.Arrays;
+
 
 public class CalculatorBackend {
     /**
@@ -16,74 +21,33 @@ public class CalculatorBackend {
     public static Result newtonRaphson(String function, double initialGuess, double tolerance, int maxIterations) {
         StringBuilder history = new StringBuilder();
         List<IterationStep> steps = new ArrayList<>();
-        
         try {
-            // Parse the function using exp4j
-            Expression f = new ExpressionBuilder(function)
-                    .variable("x")
-                    .build();
-            
-            // Calculate the derivative using central difference formula
-            double h = 1e-8; // Small value for differentiation
-            
-            double x0 = initialGuess;
-            double x1;
-            int iteration = 0;
-            double error = Double.MAX_VALUE;
-            
-            // Calculate format string based on tolerance
+            Methods m = new Methods(maxIterations);
+            m.setTolerance(BigDecimal.valueOf(tolerance));
+            Expression expr = new ExpressionBuilder(function).variable("x").build();
+            ArrayList<Double> iterates = m.newtonRaphson(expr, initialGuess, new ArrayList<>());
             int digits = (int)Math.ceil(-Math.log10(tolerance));
             String formatStr = "%." + digits + "f";
-            
             history.append("Newton-Raphson Method for finding root of: " + function + "\n");
-            history.append(String.format("Starting with initial guess x₀ = " + formatStr + "\n\n", x0));
-            history.append("Iteration | x_n | f(x_n) | f'(x_n) | Error\n");
-            history.append("---------|-----|--------|---------|------\n");
-            
-            while (error > tolerance && iteration < maxIterations) {
-                // Evaluate function at current point
-                double fx = f.setVariable("x", x0).evaluate();
-                
-                // Compute derivative using central difference formula
-                double fpx = (f.setVariable("x", x0 + h).evaluate() - 
-                             f.setVariable("x", x0 - h).evaluate()) / (2 * h);
-                
-                // Check if derivative is too close to zero
-                if (Math.abs(fpx) < 1e-10) {
-                    history.append("\nDerivative is too close to zero. Method failed to converge.\n");
-                    return new Result(x0, history.toString(), steps, false);
-                }
-                
-                // Newton-Raphson formula: x₁ = x₀ - f(x₀)/f'(x₀)
-                x1 = x0 - fx / fpx;
-                error = Math.abs(x1 - x0);
-                
-                // Record iteration details with dynamic precision
-                String iterInfo = String.format("%9d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
-                                              iteration+1, x0, fx, fpx, error);
+            history.append(String.format("Starting with initial guess x₀ = " + formatStr + "\n\n", initialGuess));
+            history.append("Iteration | x_n | f(x_n) | Error\n");
+            history.append("---------|-----|--------|------\n");
+            for (int i = 0; i < iterates.size() - 1; i++) {
+                double x0 = iterates.get(i);
+                double x1 = iterates.get(i+1);
+                double fx = expr.setVariable("x", x0).evaluate();
+                double error = Math.abs(x1 - x0);
+                String iterInfo = String.format("%9d | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", i+1, x0, fx, error);
                 history.append(iterInfo);
-                
-                steps.add(new IterationStep(iteration+1, x0, fx, fpx, error));
-                
-                // Update for next iteration
-                x0 = x1;
-                iteration++;
+                steps.add(new IterationStep(i+1, x0, fx, Double.NaN, error));
             }
-            
-            if (iteration >= maxIterations) {
-                history.append("\nReached maximum iterations. Method may not have converged.\n");
-                return new Result(x0, history.toString(), steps, false);
-            }
-            
-            // Increased precision for final result
+            double root = iterates.get(iterates.size()-1);
+            double fxRoot = expr.setVariable("x", root).evaluate();
             String highPrecisionFormat = "%." + (digits + 2) + "f";
-            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, x0));
-            history.append("\nFunction value at root: f(x) = " + 
-                          String.format(highPrecisionFormat, f.setVariable("x", x0).evaluate()));
-            history.append("\nIterations required: " + iteration);
-            
-            return new Result(x0, history.toString(), steps, true);
-            
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, root));
+            history.append("\nFunction value at root: f(x) = " + String.format(highPrecisionFormat, fxRoot));
+            history.append("\nIterations required: " + (iterates.size()-1));
+            return new Result(root, history.toString(), steps, true);
         } catch (Exception e) {
             history.append("Error in calculation: " + e.getMessage());
             return new Result(Double.NaN, history.toString(), steps, false);
@@ -103,83 +67,35 @@ public class CalculatorBackend {
     public static Result secant(String function, double x0, double x1, double tolerance, int maxIterations) {
         StringBuilder history = new StringBuilder();
         List<IterationStep> steps = new ArrayList<>();
-        
         try {
-            // Parse the function using exp4j
-            Expression f = new ExpressionBuilder(function)
-                    .variable("x")
-                    .build();
-            
-            double x2;
-            int iteration = 0;
-            double error = Double.MAX_VALUE;
-            
-            // Calculate format string based on tolerance
+            Methods m = new Methods(maxIterations);
+            m.setTolerance(BigDecimal.valueOf(tolerance));
+            Expression expr = new ExpressionBuilder(function).variable("x").build();
+            ArrayList<Double> iterates = m.secant(expr, x0, x1, new ArrayList<>());
             int digits = (int)Math.ceil(-Math.log10(tolerance));
             String formatStr = "%." + digits + "f";
-            
-            // Evaluate function at initial points
-            double fx0 = f.setVariable("x", x0).evaluate();
-            double fx1 = f.setVariable("x", x1).evaluate();
-            
             history.append("Secant Method for finding root of: " + function + "\n");
             history.append(String.format("Starting with initial guesses x₀ = " + formatStr + " and x₁ = " + formatStr + "\n\n", x0, x1));
             history.append("Iteration | x_n-1 | x_n | f(x_n-1) | f(x_n) | Error\n");
             history.append("----------|-------|-----|----------|--------|------\n");
-            
-            // Add initial step
-            String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | %s\n", 
-                                         0, x0, x1, fx0, fx1, "N/A");
-            history.append(iterInfo);
-            
-            // Store initial points (with dummy derivative and error since they are not used in secant method)
-            steps.add(new IterationStep(0, x0, fx0, Double.NaN, Double.NaN));
-            
-            while (error > tolerance && iteration < maxIterations) {
-                // Check to prevent division by zero
-                if (Math.abs(fx1 - fx0) < 1e-10) {
-                    history.append("\nDivision by zero encountered. Method failed to converge.\n");
-                    return new Result(x1, history.toString(), steps, false);
-                }
-                
-                // Secant formula: x2 = x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0))
-                x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
-                error = Math.abs(x2 - x1);
-                
-                // Evaluate function at new point
-                double fx2 = f.setVariable("x", x2).evaluate();
-                
-                // Record iteration details
-                iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
-                                       iteration+1, x1, x2, fx1, fx2, error);
+            for (int i = 0; i < iterates.size() - 2; i++) {
+                double prev = iterates.get(i);
+                double curr = iterates.get(i+1);
+                double next = iterates.get(i+2);
+                double fxPrev = expr.setVariable("x", prev).evaluate();
+                double fxCurr = expr.setVariable("x", curr).evaluate();
+                double error = Math.abs(next - curr);
+                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", i+1, prev, curr, fxPrev, fxCurr, error);
                 history.append(iterInfo);
-                
-                // In secant method, we use fpx field to store fx0 for display purposes
-                steps.add(new IterationStep(iteration+1, x1, fx1, fx0, error));
-                
-                // Update for next iteration
-                x0 = x1;
-                x1 = x2;
-                fx0 = fx1;
-                fx1 = fx2;
-                
-                iteration++;
+                steps.add(new IterationStep(i+1, curr, fxCurr, fxPrev, error));
             }
-            
-            if (iteration >= maxIterations) {
-                history.append("\nReached maximum iterations. Method may not have converged.\n");
-                return new Result(x1, history.toString(), steps, false);
-            }
-            
-            // Increased precision for final result
+            double root = iterates.get(iterates.size()-1);
+            double fxRoot = expr.setVariable("x", root).evaluate();
             String highPrecisionFormat = "%." + (digits + 2) + "f";
-            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, x1));
-            history.append("\nFunction value at root: f(x) = " + 
-                          String.format(highPrecisionFormat, f.setVariable("x", x1).evaluate()));
-            history.append("\nIterations required: " + iteration);
-            
-            return new Result(x1, history.toString(), steps, true);
-            
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, root));
+            history.append("\nFunction value at root: f(x) = " + String.format(highPrecisionFormat, fxRoot));
+            history.append("\nIterations required: " + (iterates.size()-2));
+            return new Result(root, history.toString(), steps, true);
         } catch (Exception e) {
             history.append("Error in calculation: " + e.getMessage());
             return new Result(Double.NaN, history.toString(), steps, false);
@@ -199,88 +115,36 @@ public class CalculatorBackend {
     public static Result bisection(String function, double a, double b, double tolerance, int maxIterations) {
         StringBuilder history = new StringBuilder();
         List<IterationStep> steps = new ArrayList<>();
-        
         try {
-            // Parse the function using exp4j
-            Expression f = new ExpressionBuilder(function)
-                    .variable("x")
-                    .build();
-            
-            // Calculate format string based on tolerance
+            Methods m = new Methods(maxIterations);
+            m.setTolerance(BigDecimal.valueOf(tolerance));
+            Expression expr = new ExpressionBuilder(function).variable("x").build();
+            ArrayList<Pair<Double, Double>> iterates = m.bisection(expr, a, b, new ArrayList<Pair<Double, Double>>());
             int digits = (int)Math.ceil(-Math.log10(tolerance));
             String formatStr = "%." + digits + "f";
-            
-            double fa = f.setVariable("x", a).evaluate();
-            double fb = f.setVariable("x", b).evaluate();
-            
-            // Check if there's a sign change in the interval
-            if (fa * fb >= 0) {
-                history.append("Error: Function must have opposite signs at interval endpoints.\n");
-                history.append(String.format("f(" + formatStr + ") = " + formatStr + " and f(" + formatStr + ") = " + formatStr + " have the same sign.", a, fa, b, fb));
-                return new Result(Double.NaN, history.toString(), steps, false);
-            }
-            
-            double c = 0;  // Initialize c to avoid "may not have been initialized" error
-            double fc = 0;
-            double error = b - a;
-            int iteration = 0;
-            
             history.append("Bisection Method for finding root of: " + function + "\n");
             history.append(String.format("Starting with interval [" + formatStr + ", " + formatStr + "]\n\n", a, b));
             history.append("Iteration | a | b | c | f(a) | f(b) | f(c) | Error\n");
             history.append("----------|---|---|---|------|------|------|------\n");
-            
-            while (error > tolerance && iteration < maxIterations) {
-                // Calculate midpoint
-                c = (a + b) / 2;
-                fc = f.setVariable("x", c).evaluate();
-                
-                // Record iteration details
-                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + 
-                                              formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
-                                              iteration+1, a, b, c, fa, fb, fc, error);
+            for (int i = 0; i < iterates.size(); i++) {
+                double xL = iterates.get(i).getX();
+                double xR = iterates.get(i).getY();
+                double c = (xL + xR) / 2;
+                double fa = expr.setVariable("x", xL).evaluate();
+                double fb = expr.setVariable("x", xR).evaluate();
+                double fc = expr.setVariable("x", c).evaluate();
+                double error = Math.abs(xR - xL);
+                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", i+1, xL, xR, c, fa, fb, fc, error);
                 history.append(iterInfo);
-                
-                // Store iteration info (using fpx field to store f(b) for display purposes)
-                steps.add(new IterationStep(iteration+1, c, fc, fb, error));
-                
-                // Check if we found the root exactly
-                if (Math.abs(fc) < 1e-10) {
-                    history.append("\nExact root found at x = " + String.format(formatStr, c));
-                    return new Result(c, history.toString(), steps, true);
-                }
-                
-                // Update interval
-                if (fa * fc < 0) {
-                    b = c;
-                    fb = fc;
-                } else {
-                    a = c;
-                    fa = fc;
-                }
-                
-                // Update error
-                error = b - a;
-                iteration++;
+                steps.add(new IterationStep(i+1, c, fc, fb, error));
             }
-            
-            // Final approximation is the midpoint of the final interval
-            c = (a + b) / 2;
-            
-            if (iteration >= maxIterations) {
-                history.append("\nReached maximum iterations. Method may not have converged.\n");
-                return new Result(c, history.toString(), steps, false);
-            }
-            
-            // Increased precision for final result
+            double root = (iterates.get(iterates.size()-1).getX() + iterates.get(iterates.size()-1).getY()) / 2;
+            double fxRoot = expr.setVariable("x", root).evaluate();
             String highPrecisionFormat = "%." + (digits + 2) + "f";
-            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, c));
-            history.append("\nFunction value at root: f(x) = " + 
-                          String.format(highPrecisionFormat, f.setVariable("x", c).evaluate()));
-            history.append("\nIterations required: " + iteration);
-            
-            return new Result(c, history.toString(), steps, true);
-            
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, root));
+            history.append("\nFunction value at root: f(x) = " + String.format(highPrecisionFormat, fxRoot));
+            history.append("\nIterations required: " + iterates.size());
+            return new Result(root, history.toString(), steps, true);
         } catch (Exception e) {
             history.append("Error in calculation: " + e.getMessage());
             return new Result(Double.NaN, history.toString(), steps, false);
@@ -299,72 +163,34 @@ public class CalculatorBackend {
     public static Result fixedPoint(String function, double initialGuess, double tolerance, int maxIterations) {
         StringBuilder history = new StringBuilder();
         List<IterationStep> steps = new ArrayList<>();
-        
         try {
-            // Parse the function using exp4j
-            Expression g = new ExpressionBuilder(function)
-                    .variable("x")
-                    .build();
-            
-            // Calculate format string based on tolerance
+            Methods m = new Methods(maxIterations);
+            m.setTolerance(BigDecimal.valueOf(tolerance));
+            Expression expr = new ExpressionBuilder(function).variable("x").build();
+            ArrayList<Double> iterates = m.fixedPoint(expr, initialGuess, new ArrayList<>());
             int digits = (int)Math.ceil(-Math.log10(tolerance));
             String formatStr = "%." + digits + "f";
-            
-            double x0 = initialGuess;
-            double x1;
-            double error = Double.MAX_VALUE;
-            int iteration = 0;
-            
             history.append("Fixed-Point Iteration Method for finding root of: x = " + function + "\n");
-            history.append(String.format("Starting with initial guess x₀ = " + formatStr + "\n\n", x0));
+            history.append(String.format("Starting with initial guess x₀ = " + formatStr + "\n\n", initialGuess));
             history.append("Iteration | x_n | g(x_n) | Error\n");
             history.append("----------|-----|--------|------\n");
-            
-            while (error > tolerance && iteration < maxIterations) {
-                // Evaluate function
-                x1 = g.setVariable("x", x0).evaluate();
-                error = Math.abs(x1 - x0);
-                
-                // Record iteration details
-                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
-                                              iteration+1, x0, x1, error);
+            for (int i = 0; i < iterates.size() - 1; i++) {
+                double x0 = iterates.get(i);
+                double x1 = iterates.get(i+1);
+                double gx = expr.setVariable("x", x0).evaluate();
+                double error = Math.abs(x1 - x0);
+                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", i+1, x0, gx, error);
                 history.append(iterInfo);
-                
-                // In fixed-point, we'll use fx to store g(x) and fpx can remain NaN since it's not used
-                steps.add(new IterationStep(iteration+1, x0, x1, Double.NaN, error));
-                
-                // Update for next iteration
-                x0 = x1;
-                iteration++;
-                
-                // Check if the values are growing too large (diverging)
-                if (Math.abs(x0) > 1e10) {
-                    history.append("\nMethod is diverging. Try a different function or initial guess.\n");
-                    return new Result(x0, history.toString(), steps, false);
-                }
+                steps.add(new IterationStep(i+1, x0, gx, Double.NaN, error));
             }
-            
-            if (iteration >= maxIterations) {
-                history.append("\nReached maximum iterations. Method may not have converged.\n");
-                return new Result(x0, history.toString(), steps, false);
-            }
-            
-            // To verify this is actually a fixed point, compute g(x) - x
-            // Let's create an expression for f(x) = g(x) - x
-            Expression f = new ExpressionBuilder(function + "-x")
-                    .variable("x")
-                    .build();
-            
-            double fValue = f.setVariable("x", x0).evaluate();
-            
-            // Increased precision for final result
+            double root = iterates.get(iterates.size()-1);
+            Expression f = new ExpressionBuilder(function + "-x").variable("x").build();
+            double fValue = f.setVariable("x", root).evaluate();
             String highPrecisionFormat = "%." + (digits + 2) + "f";
-            history.append("\nFixed point found: x = " + String.format(highPrecisionFormat, x0));
+            history.append("\nFixed point found: x = " + String.format(highPrecisionFormat, root));
             history.append("\nVerification: g(x) - x = " + String.format(highPrecisionFormat, fValue));
-            history.append("\nIterations required: " + iteration);
-            
-            return new Result(x0, history.toString(), steps, true);
-            
+            history.append("\nIterations required: " + (iterates.size()-1));
+            return new Result(root, history.toString(), steps, true);
         } catch (Exception e) {
             history.append("Error in calculation: " + e.getMessage());
             return new Result(Double.NaN, history.toString(), steps, false);
@@ -384,98 +210,53 @@ public class CalculatorBackend {
     public static Result falsePosition(String function, double a, double b, double tolerance, int maxIterations) {
         StringBuilder history = new StringBuilder();
         List<IterationStep> steps = new ArrayList<>();
-        
         try {
-            // Parse the function using exp4j
-            Expression f = new ExpressionBuilder(function)
-                    .variable("x")
-                    .build();
-            
-            // Calculate format string based on tolerance
+            Methods m = new Methods(maxIterations);
+            m.setTolerance(BigDecimal.valueOf(tolerance));
+            Expression expr = new ExpressionBuilder(function).variable("x").build();
+            ArrayList<Pair<Double, Double>> iterates = m.falsePosition(expr, a, b, new ArrayList<Pair<Double, Double>>());
             int digits = (int)Math.ceil(-Math.log10(tolerance));
             String formatStr = "%." + digits + "f";
-            
-            double fa = f.setVariable("x", a).evaluate();
-            double fb = f.setVariable("x", b).evaluate();
-            
-            // Check if there's a sign change in the interval
-            if (fa * fb >= 0) {
-                history.append("Error: Function must have opposite signs at interval endpoints.\n");
-                history.append(String.format("f(" + formatStr + ") = " + formatStr + " and f(" + formatStr + ") = " + formatStr + " have the same sign.", a, fa, b, fb));
-                return new Result(Double.NaN, history.toString(), steps, false);
-            }
-            
-            double c = a;  // Initialize c to avoid "may not have been initialized" error
-            double fc = 0;
-            double error = Double.MAX_VALUE;
-            int iteration = 0;
-            
             history.append("False Position Method for finding root of: " + function + "\n");
             history.append(String.format("Starting with interval [" + formatStr + ", " + formatStr + "]\n\n", a, b));
             history.append("Iteration | a | b | c | f(a) | f(b) | f(c) | Error\n");
             history.append("----------|---|---|---|------|------|------|------\n");
-            
-            // Previous c value to calculate error
-            double prevC = a;
-            
-            while (error > tolerance && iteration < maxIterations) {
-                // Calculate c using the False Position formula
-                c = (a * fb - b * fa) / (fb - fa);
-                fc = f.setVariable("x", c).evaluate();
-                
-                // Calculate error
-                error = Math.abs(c - prevC);
-                if (iteration == 0) {
-                    error = Math.abs(b - a); // For first iteration
-                }
-                
-                // Record iteration details
-                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + 
-                                              formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", 
-                                              iteration+1, a, b, c, fa, fb, fc, error);
+            for (int i = 0; i < iterates.size(); i++) {
+                double xL = iterates.get(i).getX();
+                double xR = iterates.get(i).getY();
+                double fa = expr.setVariable("x", xL).evaluate();
+                double fb = expr.setVariable("x", xR).evaluate();
+                double c = xL + (((xR-xL) * (-1 * fa)) / (fb - fa));
+                double fc = expr.setVariable("x", c).evaluate();
+                double error = Math.abs(xR - xL);
+                String iterInfo = String.format("%10d | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + " | " + formatStr + "\n", i+1, xL, xR, c, fa, fb, fc, error);
                 history.append(iterInfo);
-                
-                // Store iteration info (using fpx field to store f(b) for display purposes)
-                steps.add(new IterationStep(iteration+1, c, fc, fb, error));
-                
-                // Check if we found the root exactly
-                if (Math.abs(fc) < 1e-10) {
-                    history.append("\nExact root found at x = " + String.format(formatStr, c));
-                    return new Result(c, history.toString(), steps, true);
-                }
-                
-                // Update interval
-                if (fa * fc < 0) {
-                    b = c;
-                    fb = fc;
-                } else {
-                    a = c;
-                    fa = fc;
-                }
-                
-                // Save current c for error calculation in next iteration
-                prevC = c;
-                iteration++;
+                steps.add(new IterationStep(i+1, c, fc, fb, error));
             }
-            
-            if (iteration >= maxIterations) {
-                history.append("\nReached maximum iterations. Method may not have converged.\n");
-                return new Result(c, history.toString(), steps, false);
-            }
-            
-            // Increased precision for final result
+            double lastXL = iterates.get(iterates.size()-1).getX();
+            double lastXR = iterates.get(iterates.size()-1).getY();
+            double root = lastXL + (((lastXR-lastXL) * (-1 * expr.setVariable("x", lastXL).evaluate())) / (expr.setVariable("x", lastXR).evaluate() - expr.setVariable("x", lastXL).evaluate()));
+            double fxRoot = expr.setVariable("x", root).evaluate();
             String highPrecisionFormat = "%." + (digits + 2) + "f";
-            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, c));
-            history.append("\nFunction value at root: f(x) = " + 
-                          String.format(highPrecisionFormat, f.setVariable("x", c).evaluate()));
-            history.append("\nIterations required: " + iteration);
-            
-            return new Result(c, history.toString(), steps, true);
-            
+            history.append("\nRoot found: x = " + String.format(highPrecisionFormat, root));
+            history.append("\nFunction value at root: f(x) = " + String.format(highPrecisionFormat, fxRoot));
+            history.append("\nIterations required: " + iterates.size());
+            return new Result(root, history.toString(), steps, true);
         } catch (Exception e) {
             history.append("Error in calculation: " + e.getMessage());
             return new Result(Double.NaN, history.toString(), steps, false);
         }
+    }
+    // Matrix multiplication using Methods
+    public static double[][] multiplyMatrices(double[][] a, double[][] b) {
+        Methods m = new Methods(100); // maxIteration not used here
+        return m.matrixMultiplication(a, b);
+    }
+
+    // Cramer's rule using Methods
+    public static double[] solveCramer(double[][] augmentedMatrix) {
+        Methods m = new Methods(100); // maxIteration not used here
+        return m.cramer(augmentedMatrix);
     }
     
     /**
@@ -555,9 +336,5 @@ public class CalculatorBackend {
      * @param tolerance The tolerance for calculations
      * @return A format string with appropriate precision (e.g., "%.6f")
      */
-    private static String getFormatStringFromTolerance(double tolerance) {
-        // Calculate number of decimal places based on tolerance
-        int digits = (int)Math.ceil(-Math.log10(tolerance));
-        return "%." + digits + "f";
-    }
+    // Removed unused getFormatStringFromTolerance method
 }
